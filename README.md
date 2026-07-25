@@ -11,7 +11,7 @@ quietly die between "reply" and "proposal sent." Leadline's core object isn't
 the lead's current state, it's the **activity trail** — every status change,
 assignment, and note is a permanent row, not a field that gets overwritten.
 
-Live demo: `<add your deployed URL here>`
+Live demo: `leadline-zeta.vercel.app`
 Demo accounts (after seeding): `admin@leadline.dev` / `admin1234` and
 `member@leadline.dev` / `member1234`
 
