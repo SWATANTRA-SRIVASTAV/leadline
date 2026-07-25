@@ -17,7 +17,7 @@ export default function RootLayout({
         {children}
         <footer className="border-t border-neutral-800 py-6 text-center text-xs text-neutral-500">
           Built by{" "}
-          <span className="text-neutral-300">Your Name</span>
+          <span className="text-neutral-300">Swatantra Srivastava</span>
         </footer>
       </body>
     </html>
