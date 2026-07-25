@@ -1,0 +1,93 @@
+// Leadline — data model
+// Provider is Postgres so the same schema runs identically in dev (Neon free tier)
+// and production (Neon/Vercel Postgres). No SQLite/Postgres drift between environments.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MEMBER)
+  createdAt    DateTime @default(now())
+
+  assignedLeads Lead[]         @relation("AssignedLeads")
+  notes         Note[]
+  activities    Activity[]
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  fullName    String
+  email       String
+  company     String?
+  message     String?
+  source      String     @default("website")
+  status      LeadStatus @default(NEW)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedLeads", fields: [assignedToId], references: [id])
+
+  notes      Note[]
+  activities Activity[]
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdAt])
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  body      String
+  createdAt DateTime @default(now())
+
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  @@index([leadId])
+}
+
+// Append-only audit trail. Every mutating action on a lead writes one row here.
+// This is what "activity trail" in the brief means in practice — not a derived
+// view, but a durable log that survives even if the lead's current fields change again.
+model Activity {
+  id        String   @id @default(cuid())
+  type      String   // e.g. "CREATED", "STATUS_CHANGED", "ASSIGNED", "NOTE_ADDED"
+  detail    String   // human-readable summary, e.g. "status: NEW -> CONTACTED"
+  createdAt DateTime @default(now())
+
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  actorId String?
+  actor   User?   @relation(fields: [actorId], references: [id])
+
+  @@index([leadId])
+}
