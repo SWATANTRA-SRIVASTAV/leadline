@@ -16,13 +16,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased">
         {children}
         <footer className="border-t border-neutral-800 py-6 text-center text-xs text-neutral-500">
-          Built for{" "}
-          <a
-            href="https://digitalheroesco.com"
-            className="underline hover:text-neutral-300"
-          >
-            Digital Heroes Training Task
-          </a>
+          Built by{" "}
+          <span className="text-neutral-300">Your Name</span>
         </footer>
       </body>
     </html>
